@@ -261,7 +261,12 @@ const LeftNav = () => {
           onClick={signOut}
         />
       </div>
-      {usersPopup && <UsersPopup/>}
+      {usersPopup && (
+         <UsersPopup 
+           onHide={() => setUsersPopup(false)}
+           title="Find Users"
+         />
+      )}
     </div>
   );
 };

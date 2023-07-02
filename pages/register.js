@@ -65,7 +65,7 @@ const Register = () => {
             color:profileColors[colorIndex]
         })
        
-        await setDoc(doc(db,"userChat",user.uid),{});
+        await setDoc(doc(db,"userChats",user.uid),{});
 
         await updateProfile( user,{
              displayName,
