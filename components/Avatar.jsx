@@ -21,7 +21,7 @@ const Avatar = ({ size, user, onClick }) => {
       : size === "large"
       ? "w-10 h-10"
       : size === "x-large"
-      ? "w-14 h14"
+      ? "w-14 h-14"
       : "w-24 h-24";
 
   const f =
