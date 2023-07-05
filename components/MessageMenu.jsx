@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import ClickAwayListener from "react-click-away-listener";
 
-const MessageMenu = ({ showMenu, setShowMenu, self,deletePopupHandler }) => {
+const MessageMenu = ({ showMenu, setShowMenu, self,deletePopupHandler,setEditMsg }) => {
   const handleClickAway = () => {
     setShowMenu(false);
   };
@@ -23,7 +23,14 @@ const MessageMenu = ({ showMenu, setShowMenu, self,deletePopupHandler }) => {
       >
         <ul className="flex flex-col py-2">
           {self && (
-            <li className="flex items-center py-3 px-5 hover:bg-black cursor-pointer">
+            <li 
+               className="flex items-center py-3 px-5 hover:bg-black cursor-pointer"
+               onClick={(e)=> {
+                e.stopPropagation();
+                setEditMsg()
+                setShowMenu(false);
+               }}
+            >
               Edit message
             </li>
           )}

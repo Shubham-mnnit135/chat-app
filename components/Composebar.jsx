@@ -5,11 +5,12 @@ import {
   Timestamp,
   arrayUnion,
   doc,
+  getDoc,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import React from "react";
+import React, { useEffect } from "react";
 import { TbSend } from "react-icons/tb";
 import { v4 as uuid } from "uuid";
 
@@ -26,6 +27,10 @@ const Composebar = () => {
   } = useChatContext();
 
   const { currentUser } = useAuth();
+
+  useEffect(() => {
+    setInputText(editMsg?.text || "");
+  }, [editMsg]);
 
   const handleTyping = (e) => {
     setInputText(e.target.value);
@@ -63,13 +68,13 @@ const Composebar = () => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
             await updateDoc(doc(db, "chats", data.chatId), {
-                messages: arrayUnion({
+              messages: arrayUnion({
                 id: uuid(),
                 text: inputText,
                 sender: currentUser.uid,
                 date: Timestamp.now(),
                 read: false,
-                img: downloadURL
+                img: downloadURL,
               }),
             });
           });
@@ -89,7 +94,7 @@ const Composebar = () => {
 
     let msg = { text: inputText };
     if (attachment) {
-        msg.img = true;
+      msg.img = true;
     }
 
     await updateDoc(doc(db, "userChats", currentUser.uid), {
@@ -107,7 +112,67 @@ const Composebar = () => {
     setAttachmentPreview(null);
   };
 
-  const handleEdit = () => {};
+  const handleEdit = async () => {
+    const messageId = editMsg.id;
+    const chatRef = doc(db, "chats", data.chatId);
+
+    const chatDoc = await getDoc(chatRef);
+
+    if (attachment) {
+      const storageRef = ref(storage, uuid());
+      const uploadTask = uploadBytesResumable(storageRef, attachment);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          console.error(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            let updatedMessages = chatDoc.data().messages.map((message) => {
+              if (message.id === messageId) {
+                message.text = inputText;
+                message.img = downloadURL;
+              }
+              return message;
+            });
+            await updateDoc(chatRef, {
+              messages: updatedMessages,
+            });
+          });
+        }
+      );
+    } else {
+      let updatedMessages = chatDoc.data().messages.map((message) => {
+        if (message.id === messageId) {
+          message.text = inputText;
+        }
+        return message;
+      });
+      await updateDoc(chatRef, {
+        messages: updatedMessages,
+      });
+    }
+
+    setInputText("");
+    setAttachment(null);
+    setAttachmentPreview(null);
+    setEditMsg(null);
+  };
+
   return (
     <div className="flex items-center  gap-2 grow">
       <input
