@@ -8,7 +8,7 @@ import { DELETED_FOR_ME } from "@/utils/constants";
 
 const Messages = () => {
   const [messages, setMessages] = useState([]);
-  const { data } = useChatContext();
+  const { data, setIsTyping } = useChatContext();
 
   const ref = useRef();
   const { currentUser } = useAuth();
@@ -17,6 +17,7 @@ const Messages = () => {
     const unsub = onSnapshot(doc(db, "chats", data.chatId), (doc) => {
       if (doc.exists()) {
         setMessages(doc.data().messages);
+        setIsTyping(doc.data()?.typing?.[data.user.uid] || false);
       }
 
       setTimeout(() => {

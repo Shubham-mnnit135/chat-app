@@ -14,6 +14,8 @@ import React, { useEffect } from "react";
 import { TbSend } from "react-icons/tb";
 import { v4 as uuid } from "uuid";
 
+let typingTimeout = null;
+
 const Composebar = () => {
   const {
     inputText,
@@ -32,8 +34,23 @@ const Composebar = () => {
     setInputText(editMsg?.text || "");
   }, [editMsg]);
 
-  const handleTyping = (e) => {
+  const handleTyping = async (e) => {
     setInputText(e.target.value);
+    await updateDoc(doc(db, "chats", data.chatId), {
+      [`typing.${currentUser.uid}`]: true,
+    });
+
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    typingTimeout = setTimeout(async () => {
+      await updateDoc(doc(db, "chats", data.chatId), {
+        [`typing.${currentUser.uid}`]: false,
+      });
+
+      typingTimeout = null;
+    }, 500);
   };
 
   const onKeyUp = (e) => {
