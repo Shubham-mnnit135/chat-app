@@ -7,7 +7,6 @@ export const ChatContextPorvider = ({ children }) => {
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
 
-  
   const [inputText, setInputText] = useState("");
   const [attachment, setAttachment] = useState(null);
   const [attachmentPreview, setAttachmentPreview] = useState(null);
@@ -41,6 +40,9 @@ export const ChatContextPorvider = ({ children }) => {
               : action.payload.uid + currentUser.uid,
         };
 
+      case "EMPTY":
+        return INITIAL_STATE;
+
       default:
         return state;
     }
@@ -71,7 +73,7 @@ export const ChatContextPorvider = ({ children }) => {
         setIsTyping,
         imageViewer,
         setImageViewer,
-        resetFooterStates
+        resetFooterStates,
       }}
     >
       {children}

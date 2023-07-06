@@ -3,10 +3,16 @@ import PopupWrapper from "./PopupWrapper";
 import { useAuth } from "@/context/authContext";
 import { useChatContext } from "@/context/chatContext";
 import Avatar from "../Avatar";
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import {
+  deleteField,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import Search from "../Search";
-
 
 const UsersPopup = (props) => {
   const { currentUser } = useAuth();
@@ -26,7 +32,9 @@ const UsersPopup = (props) => {
           messages: [],
         });
 
-        const currentUserChatRef = await getDoc(doc(db, "userChats", currentUser.uid));
+        const currentUserChatRef = await getDoc(
+          doc(db, "userChats", currentUser.uid)
+        );
         const userChatRef = await getDoc(doc(db, "userChats", user.uid));
 
         if (!currentUserChatRef.exists()) {
@@ -56,22 +64,22 @@ const UsersPopup = (props) => {
           },
           [combinedId + ".date"]: serverTimestamp(),
         });
-      } 
-      else {
-
+      } else {
+        await updateDoc(doc(db, "userChats", currentUser.uid), {
+          [combinedId + ".chatDeleted"]: deleteField(),
+        });
       }
 
       dispatch({ type: "CHANGE_USER", payload: user });
-      
-      props.onHide();
 
+      props.onHide();
     } catch (error) {
       console.error(error);
     }
   };
   return (
     <PopupWrapper {...props}>
-      <Search/>
+      <Search />
       <div className="mt-5 flex flex-col gap-2 grow relative overflow-auto scrollbar">
         <div className="absolute w-full">
           {users &&

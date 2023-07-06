@@ -1,14 +1,14 @@
 import { db } from "@/firebase/firebase";
-import { 
-    collection, 
-    doc, 
-    getDoc, 
-    getDocs, 
-    query, 
-    serverTimestamp, 
-    setDoc, 
-    updateDoc, 
-    where 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 
 import React, { useState } from "react";
@@ -20,10 +20,10 @@ import { useChatContext } from "@/context/chatContext";
 const Search = () => {
   const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
-  const [err, setErr] = useState(false); 
+  const [err, setErr] = useState(false);
 
   const { currentUser } = useAuth();
-  const { dispatch } = useChatContext(); 
+  const { dispatch } = useChatContext();
 
   const onkeyp = async (e) => {
     if (e.code === "Enter" && !!username) {
@@ -94,14 +94,15 @@ const Search = () => {
           },
           [combinedId + ".date"]: serverTimestamp(),
         });
-      } 
-      else {
+      } else {
         //chat document exists
+        await updateDoc(doc(db, "userChats", currentUser.uid), {
+          [combinedId + ".chatDeleted"]: deleteField(),
+        });
       }
       setUser(null);
       setUsername("");
       dispatch({ type: "CHANGE_USER", payload: user });
-      
     } catch (error) {
       console.error(error);
     }
