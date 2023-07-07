@@ -72,7 +72,7 @@ const Register = () => {
              displayName,
         })
 
-        console.log(user);
+        // console.log(user);
         router.push("/");
     } catch (error) {
         console.error(error);

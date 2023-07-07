@@ -44,7 +44,7 @@ const Chats = () => {
       const updatedUsers = {};
       snapshot.forEach((doc) => {
         updatedUsers[doc.id] = doc.data();
-        console.log(doc.data());
+        // console.log(doc.data());
       });
       setUsers(updatedUsers);
 
@@ -129,7 +129,7 @@ const Chats = () => {
           .includes(search.toLocaleLowerCase())
     )
     .sort((a, b) => b[1].date - a[1].date);
-  console.log(filteredChats);
+  // console.log(filteredChats);
 
   const readChat = async (chatId) => {
     const chatRef = doc(db, "chats", chatId);

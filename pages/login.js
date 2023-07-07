@@ -23,6 +23,7 @@ const Login = () => {
   const router = useRouter();
   const { currentUser, isLoading } = useAuth();
   const [email, setEmail] = useState("");
+  const [isValid, setIsValid] = useState(true);
 
   useEffect(() => {
     if (!isLoading && currentUser) {
@@ -36,8 +37,9 @@ const Login = () => {
     const password = e.target[1].value;
     try {
       await signInWithEmailAndPassword(auth, email, password);
-    } catch {
-      console.error();
+    } catch (error) {
+      setIsValid(false);
+      console.error(error);
     }
   };
 
@@ -45,6 +47,7 @@ const Login = () => {
     try {
       await signInWithPopup(auth, gProvider);
     } catch (error) {
+      setIsValid(false);
       console.error(error);
     }
   };
@@ -53,6 +56,7 @@ const Login = () => {
     try {
       await signInWithPopup(auth, fProvider);
     } catch (error) {
+      setIsValid(false);
       console.error(error);
     }
   };
@@ -127,16 +131,18 @@ const Login = () => {
             placeholder="Email"
             className="w-full h-14 bg-c5 rounded-xl outline-none border-none px-5 text-c3"
             autoComplete="off"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={()=> setIsValid(true)}
           />
           <input
             type="password"
             placeholder="Password"
             className="w-full h-14 bg-c5 rounded-xl outline-none border-none px-5 text-c3"
             autoComplete="off"
+            onChange={()=> setIsValid(true)}
           />
           <div className="text-right w-full text-c3">
-            <span className="cursor-pointer" onClick={resetPassword}>
+            {!isValid ? "Wrong Email or Password ":""}
+            <span className="cursor-pointer font-semibold text-white underline underline-offset-2" onClick={resetPassword}>
               Forgot Password?
             </span>
           </div>
