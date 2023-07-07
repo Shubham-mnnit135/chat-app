@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import { doc, setDoc } from "firebase/firestore";
 import { profileColors } from "@/utils/constants";
 import Loader from "@/components/Loader";
+import Head from "next/head";
 
 const gProvider = new GoogleAuthProvider();
 const fProvider = new FacebookAuthProvider();
@@ -81,7 +82,9 @@ const Register = () => {
   return isLoading || (!isLoading && currentUser) ? (
     <Loader/>
   ) : (
+    
     <div className="h-[100vh] flex justify-center items-center bg-c1">
+      
       <div className="flex items-center flex-col">
         <div className="text-center">
           <div className="text-4xl font-bold">Create New Account</div>
@@ -124,14 +127,14 @@ const Register = () => {
             placeholder="User Name"
             className="w-full h-14 bg-c5 rounded-xl outline-none border-none px-5 text-c3"
             autoComplete="off"
-            // onChange={(e) => setEmail(e.target.value)}
+            
           />
           <input
             type="email"
             placeholder="Email"
             className="w-full h-14 bg-c5 rounded-xl outline-none border-none px-5 text-c3"
             autoComplete="off"
-            // onChange={(e) => setEmail(e.target.value)}
+            
           />
           <input
             type="password"

@@ -53,6 +53,10 @@ const ChatMenu = ({ showMenu, setShowMenu }) => {
 
       await updateDoc(doc(db, "userChats", currentUser.uid), {
         [data.chatId + ".chatDeleted"]: true,
+        [data.chatId + ".lastMessage"]: {
+          text:""
+        }
+      
       });
 
       const filteredChats = Object.entries(chats || {})

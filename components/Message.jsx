@@ -17,13 +17,8 @@ const Message = ({ message }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const { currentUser } = useAuth();
-  const { 
-    users, 
-    data, 
-    imageViewer, 
-    setImageViewer,
-    setEditMsg
-  } = useChatContext();
+  const { users, data, imageViewer, setImageViewer, setEditMsg, selectedChat } =
+    useChatContext();
 
   const self = message.sender === currentUser.uid;
 
@@ -60,11 +55,29 @@ const Message = ({ message }) => {
             };
           }
         }
-
         return message;
       });
 
       await updateDoc(chatRef, { messages: updatedMessages });
+
+      let msg = "";
+      const newMsg = updatedMessages.filter((m) => {
+          return (
+            m?.deletedInfo?.[currentUser.uid] !== DELETED_FOR_ME &&
+            !m?.deletedInfo?.deletedForEveryone &&
+            !m?.deleteChatInfo?.[currentUser.uid]
+          );
+        })
+        .map((message) => {
+          msg = message.text;
+        });
+
+      await updateDoc(doc(db, "userChats", currentUser.uid), {
+        [data.chatId + ".lastMessage"]: {
+          text: msg,
+        },
+      });
+
       setShowDeletePopup(false);
     } catch (error) {
       console.error(error);
@@ -155,7 +168,7 @@ const Message = ({ message }) => {
                 setShowMenu={setShowMenu}
                 showMenu={showMenu}
                 deletePopupHandler={deletePopupHandler}
-                setEditMsg={() =>setEditMsg(message)}
+                setEditMsg={() => setEditMsg(message)}
               />
             )}
           </div>
