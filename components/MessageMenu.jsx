@@ -8,8 +8,11 @@ const MessageMenu = ({ showMenu, setShowMenu, self,deletePopupHandler,setEditMsg
 
   const ref = useRef();
 
+  // useEffect(() => {
+  //   ref?.current?.scrollIntoViewIfNeeded();
+  // }, [showMenu]);
   useEffect(() => {
-    ref?.current?.scrollIntoViewIfNeeded();
+    ref?.current?.scrollIntoView();
   }, [showMenu]);
 
 

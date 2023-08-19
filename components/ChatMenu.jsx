@@ -98,6 +98,7 @@ const ChatMenu = ({ showMenu, setShowMenu }) => {
               e.stopPropagation();
               handleDelete();
               setShowMenu(false);
+              
             }}
           >
             Delete chat
