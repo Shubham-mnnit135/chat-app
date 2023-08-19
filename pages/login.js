@@ -72,34 +72,34 @@ const Login = () => {
     }
   };
 
-  const signInWithFacebook = async () => {
-    try {
-      await signInWithPopup(auth, fProvider);
-    } catch (error) {
-      setIsValid(false);
-      console.error(error);
-    }
-  };
+  // const signInWithFacebook = async () => {
+  //   try {
+  //     await signInWithPopup(auth, fProvider);
+  //   } catch (error) {
+  //     setIsValid(false);
+  //     console.error(error);
+  //   }
+  // };
 
-  const resetPassword = async () => {
-    try {
-      toast.promise(
-        async () => {
-          await sendPasswordResetEmail(auth, email);
-        },
-        {
-          pending: "Generating reset link",
-          success: "Reset email send to your registered email id.",
-          error: "You may have entered wrong email id!",
-        },
-        {
-          autoClose: 5000,
-        }
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const resetPassword = async () => {
+  //   try {
+  //     toast.promise(
+  //       async () => {
+  //         await sendPasswordResetEmail(auth, email);
+  //       },
+  //       {
+  //         pending: "Generating reset link",
+  //         success: "Reset email send to your registered email id.",
+  //         error: "You may have entered wrong email id!",
+  //       },
+  //       {
+  //         autoClose: 5000,
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   return isLoading || (!isLoading && currentUser) ? (
     <Loader />
