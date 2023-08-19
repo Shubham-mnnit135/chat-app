@@ -17,6 +17,7 @@ import { updateProfile } from "firebase/auth";
 import { db, auth, storage } from "@/firebase/firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import UsersPopup from "./popup/UsersPopup";
+import ChatPopup from "./popup/ChatPopup";
 
 const LeftNav = () => {
   const [usersPopup, setUsersPopup] = useState(false);
@@ -222,17 +223,22 @@ const LeftNav = () => {
       </div>
     );
   };
+
+  const popupAndProfile = () => {
+    setEditProfile(false);
+    setUsersPopup(!usersPopup)
+  }
   return (
     <div
       className={`${
-        editProfile ? "w-[350px]" : "w-[80px] items-center"
-      } flex flex-col justify-between py-5 shrink-0 transition-all`}
+        editProfile ? "h-[420px] sm:h-full sm:w-[350px] z-10 flex flex-col sm:flex-col " : " w-full sm:w-[80px] items-center flex flex-row sm:flex-col "
+      }justify-between py-2 sm:py-5 pl-5 sm:pl-0 shrink-0  flex bg-black  transition-all`}
     >
       {editProfile ? (
         editProfileContainer()
       ) : (
         <div
-          className="relative group cursor-pointer"
+          className="relative group  cursor-pointer"
           onClick={() => setEditProfile(true)}
         >
           <Avatar size="large" user={currentUser} />
@@ -243,20 +249,20 @@ const LeftNav = () => {
       )}
 
       <div
-        className={`flex gap-5 ${
-          editProfile ? "ml-5" : "flex-col items-center"
+        className={`flex justify-between gap-5 ${
+          editProfile ? "mx-5 sm:mr-7 sm:ml-9" : "flex-row sm:flex-col "
         }`}
       >
         <Icon
           size="x-large"
-          className="bg-green-500 hover:bg-gray-600"
+          className=" bg-green-500 hover:bg-gray-600"
           icon={<FiPlus size={24} />}
-          onClick={() => setUsersPopup(!usersPopup)}
+          onClick={() => popupAndProfile()}
         />
 
         <Icon
           size="x-large"
-          className="hover:bg-c2"
+          className=" hover:bg-c2"
           icon={<IoLogOutOutline size={24} />}
           onClick={signOut}
         />
@@ -267,6 +273,14 @@ const LeftNav = () => {
            title="Find Users"
          />
       )}
+      
+      {/* {usersPopup && (
+        <ChatPopup
+          onHide={() => setUsersPopup(false)}
+          title="Find Users"
+        />
+       )} */}
+      
     </div>
   );
 };

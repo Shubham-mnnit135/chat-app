@@ -15,6 +15,8 @@ import { RiSearch2Line } from "react-icons/ri";
 import Avatar from "./Avatar";
 import { useAuth } from "@/context/authContext";
 import { formateDate } from "@/utils/helpers";
+import ChatPopup from "./popup/ChatPopup";
+import { useWindowSize } from '@react-hook/window-size';
 
 const Chats = () => {
   const {
@@ -28,6 +30,9 @@ const Chats = () => {
     data,
     resetFooterStates,
   } = useChatContext();
+  const [width, setWidth] = useState(0);
+  const [windowWidth] = useWindowSize();
+  const [chatPopup, setChatPopup] = useState(false);
   const [search, setSearch] = useState("");
   const [unreadMsgs, setUnreadMsgs] = useState({});
   const { currentUser } = useAuth();
@@ -118,6 +123,11 @@ const Chats = () => {
     currentUser.uid && getChats();
   }, [isBlockExecutedRef.current, users]);
 
+  useEffect(() => {
+    setWidth(windowWidth);
+    console.log(width);
+  }, [windowWidth]);
+
   const filteredChats = Object.entries(chats || {})
   .filter(([, chat]) => !chat.hasOwnProperty("chatDeleted")).filter(
       ([, chat]) =>
@@ -153,22 +163,23 @@ const Chats = () => {
     if (unreadMsgs?.[selectedChatId]?.length > 0) {
       readChat(selectedChatId);
     }
+    setChatPopup(true);
   };
 
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 sticky -top-[20px] z-10 flex justify-center w-full bg-c2 py-5">
-        <RiSearch2Line className="absolute top-9 left-12 text-c3" />
+      <div className="shrink-0 sticky -top-[20px] z-10  flex justify-center w-full bg-c2 py-5">
+        <RiSearch2Line className="absolute top-9 left-4  text-c3" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search username..."
-          className="w-[300px] h-12 rounded-xl bg-c1/[0.5] pl-11 pr-5 placeholder:text-c3 outline-none text-base"
+          className="w-full h-12 rounded-xl bg-c1/[0.5] pl-11 pr-5 placeholder:text-c3 outline-none text-base"
         />
       </div>
 
-      <ul className="flex flex-col w-full my-5 gap-[2px]">
+      <ul className="flex flex-col w-full my-5 gap-[2px]  overflow-auto scrollbar ">
         {Object.keys(users || {}).length > 0 &&
           filteredChats?.map((chat) => {
             const timestamp = new Timestamp(
@@ -176,7 +187,7 @@ const Chats = () => {
               chat[1].date?.nanoseconds
             );
             const date = timestamp.toDate();
-            const user = users[chat[1].userInfo.uid];
+            const user = users[chat[1]?.userInfo?.uid];
             return (
               <li
                 key={chat[0]}
@@ -187,7 +198,7 @@ const Chats = () => {
                 <Avatar size="x-large" user={user} />
                 <div className="flex flex-col gap-1 grow relative">
                   <span className="text-base text-white flex items-center justify-between">
-                    <div className="font-medium">{user?.displayName}</div>
+                    <div className="font-medium line-clamp-1 break-all">{user?.displayName}</div>
                     <div className="text-c3 text-xs">{formateDate(date)}</div>
                   </span>
 
@@ -207,6 +218,12 @@ const Chats = () => {
             );
           })}
       </ul>
+      {chatPopup && width<=640 && (
+         <ChatPopup 
+           onHide={() => setChatPopup(false)}
+           title="Find Users"
+         />
+      )}
     </div>
   );
 };

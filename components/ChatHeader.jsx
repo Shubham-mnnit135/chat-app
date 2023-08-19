@@ -43,4 +43,4 @@ const ChatHeader = () => {
   )
 }
 
-export default ChatHeader
+export default ChatHeader;

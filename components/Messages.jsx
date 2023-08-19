@@ -34,7 +34,7 @@ const Messages = () => {
   };
 
   return (
-    <div ref={ref} className="grow p-5 overflow-auto scrollbar flex flex-col">
+    <div ref={ref} className="grow p-1 sm:p-5 overflow-auto scrollbar flex flex-col">
       {messages
         ?.filter((m) => {
           return (

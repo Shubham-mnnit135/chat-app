@@ -3,13 +3,14 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { IoLogoGoogle, IoLogoFacebook } from "react-icons/io";
 import Loader from "@/components/Loader";
-import { auth } from "@/firebase/firebase";
+import { auth, db } from "@/firebase/firebase";
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
+  updateProfile,
 } from "firebase/auth";
 import { useAuth } from "@/context/authContext";
 
@@ -18,6 +19,8 @@ const fProvider = new FacebookAuthProvider();
 
 import ToastMessage from "@/components/ToastMessage";
 import { toast } from "react-toastify";
+import { doc, setDoc } from "firebase/firestore";
+import { profileColors } from "@/utils/constants";
 
 const Login = () => {
   const router = useRouter();
@@ -45,7 +48,24 @@ const Login = () => {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, gProvider);
+      const { user } = await signInWithPopup(auth, gProvider);
+
+      const displayName = user.email.length<=30 ? user.email.slice(0, -10):user.email.substring(0,10);
+      const colorIndex = Math.floor(Math.random() * profileColors.length);
+
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        displayName,
+        email: user.email,
+        color: profileColors[colorIndex],
+      });
+
+      await setDoc(doc(db, "userChats", user.uid), {});
+
+      await updateProfile(user, {
+        displayName,
+      });
+      router.push("/");
     } catch (error) {
       setIsValid(false);
       console.error(error);
@@ -82,21 +102,22 @@ const Login = () => {
   };
 
   return isLoading || (!isLoading && currentUser) ? (
-    <Loader/>
+    <Loader />
   ) : (
     <div className="h-[100vh] flex justify-center items-center bg-c1">
       <ToastMessage />
       <div className="flex items-center flex-col">
         <div className="text-center">
-          <div className="text-4xl font-bold">Login to Your Account</div>
+          <div className="text-2xl sm:text-4xl font-bold">
+            Login to Your Account
+          </div>
           <div className="mt-3 text-c3">
             Connect and chat with anyone, anywhere
           </div>
         </div>
-
-        <div className="flex items-center gap-2 w-full mt-10 mb-5">
+        <div className="flex items-center gap-2 w-4/5 sm:w-[500px] mt-10 mb-5">
           <div
-            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-1/2 h-14 rounded-md cursor-pointer p-[1px]"
+            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-full h-14 rounded-md cursor-pointer p-[1px]"
             onClick={signInWithGoogle}
           >
             <div className="flex items-center justify-center gap-3 text-white font-semibold bg-c1 w-full h-full rounded-md">
@@ -105,7 +126,7 @@ const Login = () => {
             </div>
           </div>
 
-          <div
+          {/* <div
             className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-1/2 h-14 rounded-md cursor-pointer p-[1px]"
             onClick={signInWithFacebook}
           >
@@ -113,7 +134,7 @@ const Login = () => {
               <IoLogoFacebook size={24} />
               <span>Login with Facebook</span>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-center gap-1">
@@ -123,7 +144,7 @@ const Login = () => {
         </div>
 
         <form
-          className="flex flex-col items-center gap-3 w-[500px] mt-5"
+          className="flex flex-col items-center gap-3 w-4/5 sm:w-[500px] mt-5"
           onSubmit={handleSumbit}
         >
           <input
@@ -131,20 +152,17 @@ const Login = () => {
             placeholder="Email"
             className="w-full h-14 bg-c5 rounded-xl outline-none border-none px-5 text-c3"
             autoComplete="off"
-            onChange={()=> setIsValid(true)}
+            onChange={() => setIsValid(true)}
           />
           <input
             type="password"
             placeholder="Password"
             className="w-full h-14 bg-c5 rounded-xl outline-none border-none px-5 text-c3"
             autoComplete="off"
-            onChange={()=> setIsValid(true)}
+            onChange={() => setIsValid(true)}
           />
           <div className="text-right w-full text-c3">
-            {!isValid ? "Wrong Email or Password ":""}
-            <span className="cursor-pointer font-semibold text-white underline underline-offset-2" onClick={resetPassword}>
-              Forgot Password?
-            </span>
+            {!isValid ? "Wrong Email or Password " : ""}
           </div>
           <button className="mt-4 w-full h-14 rounded-xl outline-none text-base font-semibold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
             Login to Your Account

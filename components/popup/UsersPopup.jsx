@@ -79,9 +79,9 @@ const UsersPopup = (props) => {
     }
   };
   return (
-    <PopupWrapper {...props}>
+    <PopupWrapper {...props} >
       <Search />
-      <div className="mt-5 flex flex-col gap-2 grow relative overflow-auto scrollbar">
+      <div className=" z-20 mt-5 flex flex-col gap-2 grow relative overflow-auto scrollbar ">
         <div className="absolute w-full">
           {users &&
             Object.values(users)?.filter((m)=>{

@@ -1,11 +1,10 @@
 import Link from "next/link";
 import React, { useEffect } from "react";
-import { IoLogoGoogle, IoLogoFacebook } from "react-icons/io";
+import { IoLogoGoogle,} from "react-icons/io";
 
 import { auth, db } from "@/firebase/firebase";
 import {
   GoogleAuthProvider,
-  FacebookAuthProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
   updateProfile
@@ -18,7 +17,6 @@ import Loader from "@/components/Loader";
 import Head from "next/head";
 
 const gProvider = new GoogleAuthProvider();
-const fProvider = new FacebookAuthProvider();
 const Register = () => {
   const router = useRouter();
   const { currentUser, isLoading } = useAuth();
@@ -32,19 +30,30 @@ const Register = () => {
 
   const signInWithGoogle = async () => {
     try {
-      await signInWithPopup(auth, gProvider);
+      const { user } = await signInWithPopup(auth, gProvider);
+      
+      const displayName = user.email.length<=30 ? user.email.slice(0, -10):user.email.substring(0,10);
+      const colorIndex = Math.floor(Math.random() * profileColors.length);
+      
+      await setDoc( doc(db,"users",user.uid),{
+        uid:user.uid,
+        displayName,
+        email:user.email,
+        color:profileColors[colorIndex]
+      })
+
+      await setDoc(doc(db,"userChats",user.uid),{});
+
+      await updateProfile( user,{
+           displayName,
+      })
+      router.push("/");
     } catch (error) {
       console.error(error);
     }
   };
 
-  const signInWithFacebook = async () => {
-    try {
-      await signInWithPopup(auth, fProvider);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  
 
   const handleSumbit = async (e) => {
     e.preventDefault();
@@ -87,15 +96,15 @@ const Register = () => {
       
       <div className="flex items-center flex-col">
         <div className="text-center">
-          <div className="text-4xl font-bold">Create New Account</div>
+          <div className="text-2xl sm:text-4xl font-bold">Create New Account</div>
           <div className="mt-3 text-c3">
             Connect and chat with anyone, anywhere
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full mt-10 mb-5">
+        <div className="flex items-center gap-2 w-4/5 sm:w-[500px] mt-10 mb-5">
           <div
-            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-1/2 h-14 rounded-md cursor-pointer p-[1px]"
+            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-full h-14 rounded-md cursor-pointer p-[1px]"
             onClick={signInWithGoogle}
           >
             <div className="flex items-center justify-center gap-3 text-white font-semibold bg-c1 w-full h-full rounded-md">
@@ -104,15 +113,7 @@ const Register = () => {
             </div>
           </div>
 
-          <div
-            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-1/2 h-14 rounded-md cursor-pointer p-[1px]"
-            onClick={signInWithFacebook}
-          >
-            <div className="flex items-center justify-center gap-3 text-white font-semibold bg-c1 w-full h-full rounded-md">
-              <IoLogoFacebook size={24} />
-              <span>Login with Facebook</span>
-            </div>
-          </div>
+         
         </div>
 
         <div className="flex items-center gap-1">
@@ -121,7 +122,7 @@ const Register = () => {
           <span className="w-5 h-[1px] bg-c3"></span>
         </div>
 
-        <form onSubmit={handleSumbit} className="flex flex-col items-center gap-3 w-[500px] mt-5">
+        <form onSubmit={handleSumbit} className="flex flex-col items-center gap-3 w-4/5 sm:w-[500px] mt-5">
           <input
             type="text"
             placeholder="User Name"

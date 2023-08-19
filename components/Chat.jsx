@@ -17,7 +17,7 @@ const Chat = () => {
     (u) => u === currentUser.uid
   );
   return (
-    <div className="flex flex-col p-5 grow">
+    <div className="flex flex-col p-5 grow ">
       <ChatHeader />
       {data.chatId && <Messages />}
       {!isUserBlocked && !IamBlocked && <ChatFooter />}
